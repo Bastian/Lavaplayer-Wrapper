@@ -14,6 +14,6 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.github.Bastian.Javacord', name: 'javacord', version: '48d5cc9'
+    implementation group: 'com.github.Bastian.Javacord', name: 'javacord', version: '58de4cb'
     implementation group: 'com.sedmelluq', name: 'lavaplayer', version: '1.3.10'
 }
