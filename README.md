@@ -3,6 +3,33 @@
 A simple wrapper around the [Lavaplayer](https://github.com/sedmelluq/lavaplayer) library that implements various
 [Javacord](https://github.com/Javacord/Javacord) audio sources.
 
+The goal of the project is to provide Javacord audio sources by wrapping the Lavaplayer library. This is only a
+temporary solution and we are going to create a lightweight audio sources repository that is independent of Lavaplayer 
+once Javacord's audio api get's released and is fully usable. At the moment, the focus is on making Javacord's audio
+stable and ready for release.
+
+## Disclaimer
+
+This repository is using [Bastian's Javacord fork](https://github.com/Bastian/Javacord/tree/audio-support) which adds 
+audio support to Javacord. It is still in development and can introduce breaking changes at any time. Once it will be
+merged into the official Javacord repository, this repository will be updated to use the official audio api.
+
+## Download
+
+This repository is currently only available through Jitpack. Future version will be published to Maven Central.
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: 'master-SNAPSHOT'
+}
+```
+
+Do not include Javacord or Lavaplayer, but use the one that ships with this dependency.
+
 ## Supported audio sources
 
 ### LavaplayerAudioSource
