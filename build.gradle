@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'org.javacord'
+version '1.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation group: 'com.github.Bastian.Javacord', name: 'javacord', version: '48d5cc9'
+    implementation group: 'com.sedmelluq', name: 'lavaplayer', version: '1.3.10'
+}
