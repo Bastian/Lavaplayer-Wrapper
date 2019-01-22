@@ -80,4 +80,29 @@ Take a look at Lavaplayer's documentation for more details.
 
 ### YouTubeAudioSource
 
-... coming soon
+An audio source that supports playing YouTube videos.
+
+```java
+DiscordApi api = ...;
+AudioConnection connection = ...;
+
+// Simple version
+AudioSource source = new YouTubeAudioSource("https://youtu.be/NvS351QKFV4");
+connection.queue(source);
+
+// Advanced
+AudioSource source = new YouTubeAudioSourceBuilder()
+    .setUrl("https://youtu.be/NvS351QKFV4")
+    .setBufferSize(30, TimeUnit.SECONDS) // Sets the size of the buffer
+    .setKeepInMemoryAfterUsage(true) // Keep the audio packets cached for easy reusability with #copy()
+    .build();
+
+// Download the whole song before queuing it.
+source.download().thenAccept(connection::queue).exceptionally(t -> {
+    // Handle exception while downloading
+    t.printStackTrace();
+    return null;
+});
+```
+
+Disclaimer: The advanced version is not available yet!
