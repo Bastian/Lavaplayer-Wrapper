@@ -20,6 +20,7 @@ This repository is currently only available through Jitpack. Future version will
 
 ```groovy
 repositories {
+    jcenter()
     maven { url 'https://jitpack.io' }
 }
 
@@ -28,7 +29,7 @@ dependencies {
 }
 ```
 
-Do not include Javacord or Lavaplayer, but use the one that ships with this dependency.
+For best compatibility, do not include Javacord or Lavaplayer but use the one that ships with this dependency.
 
 ## Supported audio sources
 
@@ -42,6 +43,7 @@ you can just directly use the Lavaplayer library.
 ```java
 DiscordApi api = ...;
 AudioConnection connection = ...;
+
 // Create a player manager
 AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
 AudioPlayer player = playerManager.createPlayer();
@@ -54,13 +56,13 @@ connection.queue(source);
 playerManager.loadItem(identifier, new AudioLoadResultHandler() {
     @Override
     public void trackLoaded(AudioTrack track) {
-        trackScheduler.queue(track);
+        player.play(track);
     }
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
         for (AudioTrack track : playlist.getTracks()) {
-            trackScheduler.queue(track);
+            player.play(track);
         }
     }
 
@@ -87,22 +89,17 @@ DiscordApi api = ...;
 AudioConnection connection = ...;
 
 // Simple version
-AudioSource source = new YouTubeAudioSource("https://youtu.be/NvS351QKFV4");
+AudioSource source = YouTubeAudioSource.of(api, "https://youtu.be/NvS351QKFV4").join();
 connection.queue(source);
 
 // Advanced
-AudioSource source = new YouTubeAudioSourceBuilder()
+AudioSource source = new YouTubeAudioSourceBuilder(api)
     .setUrl("https://youtu.be/NvS351QKFV4")
-    .setBufferSize(30, TimeUnit.SECONDS) // Sets the size of the buffer
-    .setKeepInMemoryAfterUsage(true) // Keep the audio packets cached for easy reusability with #copy()
-    .build();
-
-// Download the whole song before queuing it.
-source.download().thenAccept(connection::queue).exceptionally(t -> {
-    // Handle exception while downloading
-    t.printStackTrace();
-    return null;
-});
+    .build()
+    .thenCompose(YouTubeAudioSource::download) // Optional: Download the full song before queueing it.
+    .thenAccept(connection::queue)
+    .exceptionally(throwable -> {
+        // Loading or downloading the youtube video failed
+        return null;
+    });
 ```
-
-Disclaimer: The advanced version is not available yet!
