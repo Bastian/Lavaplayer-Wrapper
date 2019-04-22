@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     implementation group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: 'master-SNAPSHOT'
+    implementation group: 'com.github.Bastian.Javacord', name: 'javacord', version: 'ae51320'
 }
 ```
 
