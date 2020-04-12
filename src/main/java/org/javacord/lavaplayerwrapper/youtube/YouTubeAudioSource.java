@@ -141,6 +141,9 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
 
     @Override
     public Duration getPosition() {
+        if(allFrames != null) {
+            return Duration.ofMillis(position * 20);
+        }
         return Duration.ofMillis(track.getPosition());
     }
 
@@ -194,28 +197,24 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
             return future;
         }
 
-        AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-        AudioPlayer helperPlayer = playerManager.createPlayer();
-        helperPlayer.playTrack(track.makeClone());
-
         getApi().getThreadPool().getExecutorService().submit(() -> {
             List<byte[]> frames = new ArrayList<>();
             AudioFrame frame;
+
             try {
                 frame = player.provide(1, TimeUnit.MINUTES);
+                while (frame != null) {
+                    frames.add(frame.getData());
+                    frame = player.provide(1, TimeUnit.MINUTES);
+                }
             } catch (Throwable t) {
                 future.completeExceptionally(t);
                 return;
             }
-            while (frame != null) {
-                frames.add(frame.getData());
-                frame = player.provide();
-            }
-            this.position = (int) (track.getPosition() / 20);
+
             this.allFrames = frames;
             // Clean up the players, as we no longer need them
             this.player.destroy();
-            helperPlayer.destroy();
 
             future.complete(this);
         });
@@ -230,11 +229,14 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
 
     @Override
     public byte[] getNextFrame() {
-        if (paused || lastFrame == null) {
+        if(paused) {
             return null;
         }
         if (allFrames != null) {
             return applyTransformers(allFrames.get(position++));
+        }
+        if (lastFrame == null) {
+            return null;
         }
         return applyTransformers(lastFrame.getData());
     }
