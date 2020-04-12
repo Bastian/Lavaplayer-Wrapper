@@ -14,6 +14,8 @@ import org.javacord.api.audio.DownloadableAudioSource;
 import org.javacord.api.audio.PauseableAudioSource;
 import org.javacord.api.audio.SeekableAudioSource;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -138,13 +140,13 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
     }
 
     @Override
-    public long getPosition(TimeUnit unit) {
-        return unit.convert(track.getPosition(), TimeUnit.MILLISECONDS);
+    public Duration getPosition() {
+        return Duration.ofMillis(track.getPosition());
     }
 
     @Override
-    public long getDuration(TimeUnit unit) {
-        return unit.convert(track.getDuration(), TimeUnit.MILLISECONDS);
+    public Duration getDuration() {
+        return Duration.ofMillis(track.getDuration());
     }
 
     @Override
@@ -158,20 +160,20 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
     }
 
     @Override
-    public long getBufferSize(TimeUnit unit) {
+    public Duration getBufferSize() {
         if (allFrames != null) {
-            return Long.MAX_VALUE;
+            return ChronoUnit.FOREVER.getDuration();
         }
-        return bufferDurationInMillis;
+        return Duration.ofMillis(bufferDurationInMillis);
     }
 
     @Override
-    public long getUsedBufferSize(TimeUnit unit) {
+    public Duration getUsedBufferSize() {
         if (allFrames != null) {
-            return unit.convert(allFrames.size() * 20, TimeUnit.MILLISECONDS);
+            return Duration.ofMillis(allFrames.size() * 20);
         }
         // Lavaplayer does not provide a way to tell the used buffer size
-        return -1;
+        return Duration.ofMillis(-1);
     }
 
     @Override
@@ -232,9 +234,9 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
             return null;
         }
         if (allFrames != null) {
-            return applySynthesizers(allFrames.get(position++));
+            return applyTransformers(allFrames.get(position++));
         }
-        return applySynthesizers(lastFrame.getData());
+        return applyTransformers(lastFrame.getData());
     }
 
     @Override
@@ -258,7 +260,7 @@ public class YouTubeAudioSource extends AudioSourceBase implements SeekableAudio
     }
 
     @Override
-    public AudioSource clone() {
+    public AudioSource copy() {
         if (allFrames != null) {
             return new YouTubeAudioSource(getApi(), allFrames, url, title, creatorName);
         }

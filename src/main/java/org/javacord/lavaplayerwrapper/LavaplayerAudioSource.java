@@ -36,7 +36,7 @@ public class LavaplayerAudioSource extends AudioSourceBase {
         if (lastFrame == null) {
             return null;
         }
-        return applySynthesizers(lastFrame.getData());
+        return applyTransformers(lastFrame.getData());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class LavaplayerAudioSource extends AudioSourceBase {
     }
 
     @Override
-    public AudioSource clone() {
+    public AudioSource copy() {
         return new LavaplayerAudioSource(getApi(), audioPlayer);
     }
 }
